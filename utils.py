@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pykrx import stock
 
+def annualized(i):
+    return (1+i)**240-1
 
 def smooth(l, weight):
     s = np.zeros(len(l))
@@ -41,25 +43,41 @@ def derivative2(l, s):
     return d
 
 
-def ma(l, k=240):
+def ma(l, start_index, k=240):
     ma = []
-    for i in range(k - 1, len(l)):
-        ma.append(np.mean(l[i - k + 1:i]))
+    for i in range(len(l)):
+        if i >= k - 1:
+            ma.append(np.mean(l[i - k + 1:i]))
+        else:
+            ma.append(0)
+    #print(ma[start_index:])
 
-    return l[k - 1:], ma
+    return l[start_index:], ma[start_index:]
 
-def get_p_list(name, start_date, end_date):
-    s = pd.DataFrame()
+def get_p_list_kr(name, start_date, end_date):
+    #print(start_date)
     start_date = str(int(start_date) - 10000)
     s_ = stock.get_market_ohlcv_by_date(start_date, end_date, name)
     l = list(s_['종가'])
     x = list(s_.index)
+    #print(x)
+    start_index = x.index(datetime.datetime(int(start_date[:4])+1, int(start_date[4:6]), int(start_date[6:8])))
 
-    return l, x
+    return l, x, start_index
+
+def get_p_list_us(name, start_date, end_date):
+    start = datetime.datetime(int(start_date[:4])-1, int(start_date[4:6]), int(start_date[6:8]))
+    end = datetime.datetime(int(end_date[:4]), int(end_date[4:6]), int(end_date[6:8]))
+    s_ = yf.download(name, start=start, end=end, progress=False)
+    l = list(s_['Adj Close'])
+    x = list(s_.index)
+    start_index = x.index(datetime.datetime(int(start_date[:4]), int(start_date[4:6]), int(start_date[6:8])))
+
+    return l, x, start_index
 
 def draw(s_list, start_date='20160201', end_date='20201109'):
     for name in s_list:
-        l, x = get_p_list(name, start_date, end_date)
+        l, x, start_index = get_p_list_kr(name, start_date, end_date)
 
         #smoothed = double_smooth(l, 0.02, 0.03)
         l, ma_240 = ma(l)
@@ -75,3 +93,4 @@ def draw(s_list, start_date='20160201', end_date='20201109'):
         plt.plot(x, np.zeros(len(dr)))
         #plt.yscale('log')
         plt.show()
+
