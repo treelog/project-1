@@ -48,14 +48,18 @@ def ma(l, k=240):
 
     return l[k - 1:], ma
 
+def get_p_list(name, start_date, end_date):
+    s = pd.DataFrame()
+    start_date = str(int(start_date) - 10000)
+    s_ = stock.get_market_ohlcv_by_date(start_date, end_date, name)
+    l = list(s_['종가'])
+    x = list(s_.index)
+
+    return l, x
+
 def draw(s_list, start_date='20160201', end_date='20201109'):
     for name in s_list:
-        print(stock.get_market_ticker_name(name[:-3]))
-        s = pd.DataFrame()
-        start_date = str(int(start_date)-10000)
-        s_ = stock.get_market_ohlcv_by_date("20160201", "20201109", name[:-3])
-        l = list(s_['종가'])
-        x = list(s_.index)
+        l, x = get_p_list(name, start_date, end_date)
 
         #smoothed = double_smooth(l, 0.02, 0.03)
         l, ma_240 = ma(l)
