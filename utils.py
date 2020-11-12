@@ -42,6 +42,11 @@ def derivative2(l, s):
         d[i] = (s[i] - l[i])
     return d
 
+def derivative_abs(l):
+    d = np.zeros(len(l))
+    for i in range(1, len(l)):
+        d[i] = (l[i] - l[i - 1])
+    return d
 
 def ma(l, start_index, k=240):
     ma = []
@@ -49,10 +54,10 @@ def ma(l, start_index, k=240):
         if i >= k - 1:
             ma.append(np.mean(l[i - k + 1:i]))
         else:
-            ma.append(0)
+            ma.append(np.mean(l[:k]))
     #print(ma[start_index:])
 
-    return l[start_index:], ma[start_index:]
+    return ma[start_index:]
 
 def get_p_list_kr(name, start_date, end_date):
     #print(start_date)
