@@ -15,6 +15,7 @@ def get_current_ma(name, country, start_date='20160201', end_date='20201109', k=
     return l, ma_240, dr
 
 def criteria(p, ma_low, dr):
+    ma_low = ma(ma(ma_low, k=10), k=5)
     discripency_rate_cr = (p[-1]-ma_low[-1])/ma_low[-1]
     annualized_growth_rate = (1+dr[-1])**240-1
     dr = ma(derivative(ma_low),0, k=60)
@@ -89,27 +90,27 @@ def backtest(name, start=date(2013, 8, 14), end=date(2020, 11, 11), country='kr'
         l, x , start_index = get_p_list_us(name, start_date=start_date, end_date=end_date)
 
     p = l[start_index:]
-    ma_240 = ma(l, start_index, 240)
-    ma_60 = ma(l, start_index, 20)
-    dr = derivative(ma_240)
+    ma_low = ma(l, start_index, 360)
+    ma_high = ma(l, start_index, 20)
+    dr = derivative(ma_low)
     x = x[start_index:]
 
     for i in range(1, len(p)):
         if bs == 1:
             holding_period += 1
-        if criteria(p[:i], ma_240[:i], dr[:i]):
-            #print('Good', p[i-1], x[i-1])
+        if criteria(p[:i], ma_low[:i], dr[:i]):
+            print('Good', p[i-1], x[i-1])
             good_list.append(x[i-1])
             if bs == 0:
                 no_share = budget/p[i-1]
                 budget = 0
                 bs = 1
-        elif  criteria1(p[:i], ma_240[:i], dr[:i]) and bs==0:
-            #print('Good', p[i-1], x[i-1])
-            no_share = budget/p[i-1]
-            budget = 0
-            bs = 1
-        elif criteria3(p[:i], ma_60[:i], ma_240[:i], dr[:i]):
+        #elif  criteria1(p[:i], ma_low[:i], dr[:i]) and bs==0:
+        #    #print('Good', p[i-1], x[i-1])
+        #    no_share = budget/p[i-1]
+        #    budget = 0
+        #    bs = 1
+        elif criteria3(p[:i], ma_high[:i], ma_low[:i], dr[:i]):
             #print('Bad', p[i-1], x[i-1])
             bad_list.append(x[i-1])
             if bs==1:

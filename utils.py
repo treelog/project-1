@@ -48,7 +48,7 @@ def derivative_abs(l):
         d[i] = (l[i] - l[i - 1])
     return d
 
-def ma(l, start_index, k=240):
+def ma(l, start_index=0, k=240):
     ma = []
     for i in range(len(l)):
         if i >= k - 1:
