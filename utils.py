@@ -61,7 +61,7 @@ def ma(l, start_index=0, k=240):
 
 def get_p_list_kr(name, start_date, end_date):
     #print(start_date)
-    start_date = str(int(start_date) - 10000)
+    start_date = str(int(start_date) - 20000)
     s_ = stock.get_market_ohlcv_by_date(start_date, end_date, name)
     l = list(s_['종가'])
     x = list(s_.index)
@@ -71,7 +71,7 @@ def get_p_list_kr(name, start_date, end_date):
     return l, x, start_index
 
 def get_p_list_us(name, start_date, end_date):
-    start = datetime.datetime(int(start_date[:4])-1, int(start_date[4:6]), int(start_date[6:8]))
+    start = datetime.datetime(int(start_date[:4])-2, int(start_date[4:6]), int(start_date[6:8]))
     end = datetime.datetime(int(end_date[:4]), int(end_date[4:6]), int(end_date[6:8]))
     s_ = yf.download(name, start=start, end=end, progress=False)
     l = list(s_['Adj Close'])

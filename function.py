@@ -99,7 +99,7 @@ def backtest(name, start=date(2013, 8, 14), end=date(2020, 11, 11), country='kr'
         if bs == 1:
             holding_period += 1
         if criteria(p[:i], ma_low[:i], dr[:i]):
-            print('Good', p[i-1], x[i-1])
+            #print('Good', p[i-1], x[i-1])
             good_list.append(x[i-1])
             if bs == 0:
                 no_share = budget/p[i-1]
