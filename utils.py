@@ -6,6 +6,7 @@ import requests
 import numpy as np
 import matplotlib.pyplot as plt
 from pykrx import stock
+from itertools import islice
 
 def annualized(i):
     return (1+i)**240-1
@@ -99,3 +100,14 @@ def draw(s_list, start_date='20160201', end_date='20201109'):
         #plt.yscale('log')
         plt.show()
 
+
+def window(seq, n=2):
+    "Returns a sliding window (of width n) over data from the iterable"
+    "   s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...                   "
+    it = iter(seq)
+    result = tuple(islice(it, n))
+    if len(result) == n:
+        yield np.array(result)
+    for elem in it:
+        result = result[1:] + (elem,)
+        yield np.array(result)
