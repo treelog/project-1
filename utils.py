@@ -66,7 +66,7 @@ def get_p_list_kr(name, start_date, end_date):
     l = list(s_['종가'])
     x = list(s_.index)
     #print(x)
-    start_index = x.index(datetime.datetime(int(start_date[:4])+1, int(start_date[4:6]), int(start_date[6:8])))
+    start_index = x.index(datetime.datetime(int(start_date[:4])+2, int(start_date[4:6]), int(start_date[6:8])))
 
     return l, x, start_index
 
