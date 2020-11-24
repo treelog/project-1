@@ -1,6 +1,6 @@
 import numpy as np
 from utils import *
-from .padding import get_padder
+from padding import get_padder
 from scipy.stats import norm
 
 class Kalman():
@@ -85,10 +85,11 @@ class BaseSpatialFilter():
         return x
 
     def fit_transform(self, seq):
+        print(seq)
         self.fit(seq)
+        print(seq)
         return self.transform(seq)
 
-    @abc.abstractmethod
     def _filt(self, sub_seq):
         """Execute filtering for sub sequence.
         """
@@ -117,18 +118,22 @@ class BilateralFilter(GaussianFilter):
     """Bilateral Filtering Class.
     """
     def __init__(self, win_size, padding="same", n_iter=1,\
-            sigma_d=None, sigma_i=None):
+            sigma_d=None, sigma_i=None, causal=True):
         super(BilateralFilter, self).__init__(win_size, padding, n_iter, sigma_d)
         self.sigma_i = sigma_i
+        self.causal = causal
 
     def _filt(self, sub_seq):
         if self.sigma_i is None:
             self.sigma_i = self._suggest_sigma_i()
 
+        if self.causal:
+            sub_seq[self.win_size//2+1:] = np.array([sub_seq[self.win_size//2]*(self.win_size//2)])
         w = norm.pdf(sub_seq, loc=sub_seq[self.med_idx], scale=self.sigma_i)
         weight = self.weight * w
         weight /= weight.sum()
 
+        #print('weight', weight)
         prod = weight.reshape(1, -1) @ sub_seq.reshape(-1, 1)
         return prod[0, 0]
 

@@ -67,7 +67,7 @@ def criteria4(p, ma_low, kal):
         return True
     else:
         return False
-
+    
 def current_ma_dr(s_list, country='kr'):
     for name in s_list:
         p, ma, dr = get_current_ma(name, country)
