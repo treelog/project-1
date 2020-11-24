@@ -67,7 +67,36 @@ def criteria4(p, ma_low, kal):
         return True
     else:
         return False
-    
+
+def criteria5(p, bil):
+    #p = np.array(p)
+    #mean_p = np.mean(p)
+    #bilateral = BilateralFilter(61, sigma_d=mean_p // 3, sigma_i=mean_p, n_iter=1)
+    #bil = bilateral.fit_transform(p)
+    if len(bil)>1:
+        a = bil[-1] - bil[-2]
+    else:
+        a = 0
+    #dr_bil = derivative_abs(bil)
+    residual = p - bil
+    #print(a)
+    #print(residual[-1])
+    if a>0:
+        return True
+    else:
+        return False
+
+def criteria6(p, bil):
+    if len(bil)>1:
+        a = bil[-1] - bil[-2]
+    else:
+        a = 0
+
+    if a<0:
+        return True
+    else:
+        return False
+
 def current_ma_dr(s_list, country='kr'):
     for name in s_list:
         p, ma, dr = get_current_ma(name, country)
@@ -102,6 +131,10 @@ def backtest(name, start=date(2013, 8, 14), end=date(2020, 11, 11), country='kr'
     p = l[start_index:]
     kalman = Kalman(Q=0.0002)
     kal = kalman(p)
+    mean_p = np.mean(np.array(l))
+    bilateral = BilateralFilter(121, sigma_d=mean_p // 3, sigma_i=mean_p, n_iter=1)
+    bil = bilateral.fit_transform(np.array(l))
+    bil = bil[start_index:]
     ma_low = ma(l, start_index, 360)
     ma_high = ma(l, start_index, 20)
     dr = derivative(ma_low)
@@ -111,8 +144,9 @@ def backtest(name, start=date(2013, 8, 14), end=date(2020, 11, 11), country='kr'
         if bs == 1:
             holding_period += 1
         #if criteria(p[:i], ma_low[:i], dr[:i]):
-        if criteria4(p[:i], ma_low[:i], kal[:i]):
-            #print('Good', p[i-1], x[i-1])
+        #if criteria4(p[:i], ma_low[:i], kal[:i]):
+        if criteria5(p[:i], bil[:i]):
+            print('Good', p[i-1], x[i-1])
             good_list.append(x[i-1])
             if bs == 0:
                 no_share = budget/p[i-1]
@@ -124,7 +158,8 @@ def backtest(name, start=date(2013, 8, 14), end=date(2020, 11, 11), country='kr'
         #    budget = 0
         #    bs = 1
         elif criteria3(p[:i], ma_high[:i], ma_low[:i], dr[:i]):
-            #print('Bad', p[i-1], x[i-1])
+        #elif criteria6(p[:i], bil[:i]):
+            print('Bad', p[i-1], x[i-1])
             bad_list.append(x[i-1])
             if bs==1:
                 budget = no_share*p[i-1]

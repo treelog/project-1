@@ -85,9 +85,9 @@ class BaseSpatialFilter():
         return x
 
     def fit_transform(self, seq):
-        print(seq)
+        #print(seq)
         self.fit(seq)
-        print(seq)
+        #print(seq)
         return self.transform(seq)
 
     def _filt(self, sub_seq):
